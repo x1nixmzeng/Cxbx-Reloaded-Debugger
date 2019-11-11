@@ -52,7 +52,6 @@
             this.btnGo = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.cbDisAddr = new System.Windows.Forms.ComboBox();
-            this.txDisassembly = new CxbxDebugger.RicherTextBox();
             this.tabBreakpoints = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -76,6 +75,7 @@
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.txMemoryDump = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.cbDataFormat = new System.Windows.Forms.ComboBox();
@@ -90,6 +90,7 @@
             this.tabCEContainer = new System.Windows.Forms.TabControl();
             this.tabSubData = new System.Windows.Forms.TabPage();
             this.splitContainer6 = new System.Windows.Forms.SplitContainer();
+            this.btnRevert = new System.Windows.Forms.Button();
             this.btnRefresh = new System.Windows.Forms.Button();
             this.btnLoadCT = new System.Windows.Forms.Button();
             this.btnApply = new System.Windows.Forms.Button();
@@ -112,6 +113,8 @@
             this.lbDebug = new System.Windows.Forms.ListBox();
             this.diagSaveMemory = new System.Windows.Forms.SaveFileDialog();
             this.diagBrowseCT = new System.Windows.Forms.OpenFileDialog();
+            this.button2 = new System.Windows.Forms.Button();
+            this.txDisassembly = new CxbxDebugger.RicherTextBox();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.statusBar.SuspendLayout();
@@ -328,15 +331,16 @@
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.BackColor = System.Drawing.Color.Transparent;
             this.splitContainer2.Panel2.Controls.Add(this.txDisassembly);
             this.splitContainer2.Size = new System.Drawing.Size(714, 190);
-            this.splitContainer2.SplitterDistance = 34;
+            this.splitContainer2.SplitterDistance = 30;
             this.splitContainer2.TabIndex = 2;
             // 
             // btnToMemory
             // 
             this.btnToMemory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnToMemory.Location = new System.Drawing.Point(467, 3);
+            this.btnToMemory.Location = new System.Drawing.Point(452, 3);
             this.btnToMemory.Name = "btnToMemory";
             this.btnToMemory.Size = new System.Drawing.Size(119, 23);
             this.btnToMemory.TabIndex = 4;
@@ -398,21 +402,6 @@
             this.cbDisAddr.SelectedIndexChanged += new System.EventHandler(this.cbDisAddr_SelectedIndexChanged);
             this.cbDisAddr.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBox1_KeyDown);
             // 
-            // txDisassembly
-            // 
-            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
-            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
-            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
-            this.txDisassembly.Name = "txDisassembly";
-            this.txDisassembly.ReadOnly = true;
-            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.txDisassembly.Size = new System.Drawing.Size(714, 152);
-            this.txDisassembly.TabIndex = 1;
-            this.txDisassembly.Text = "";
-            // 
             // tabBreakpoints
             // 
             this.tabBreakpoints.Controls.Add(this.splitContainer3);
@@ -427,6 +416,7 @@
             // splitContainer3
             // 
             this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.IsSplitterFixed = true;
             this.splitContainer3.Location = new System.Drawing.Point(3, 3);
             this.splitContainer3.Name = "splitContainer3";
             // 
@@ -668,6 +658,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.textBox2);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.cbDataFormat);
@@ -686,13 +677,25 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "View or Dump Memory";
             // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(88, 100);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(240, 23);
+            this.button1.TabIndex = 11;
+            this.button1.Text = "Add Breakpoint";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_3);
+            // 
             // textBox2
             // 
             this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(213, 129);
+            this.textBox2.Location = new System.Drawing.Point(202, 130);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(115, 20);
+            this.textBox2.Size = new System.Drawing.Size(126, 20);
             this.textBox2.TabIndex = 10;
             // 
             // label8
@@ -706,13 +709,11 @@
             // 
             // cbDataFormat
             // 
-            this.cbDataFormat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.cbDataFormat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbDataFormat.FormattingEnabled = true;
             this.cbDataFormat.Location = new System.Drawing.Point(88, 130);
             this.cbDataFormat.Name = "cbDataFormat";
-            this.cbDataFormat.Size = new System.Drawing.Size(119, 21);
+            this.cbDataFormat.Size = new System.Drawing.Size(108, 21);
             this.cbDataFormat.TabIndex = 8;
             this.cbDataFormat.SelectionChangeCommitted += new System.EventHandler(this.cbDataFormat_SelectionChangeCommitted);
             // 
@@ -739,13 +740,13 @@
             // 
             // btnDumpMemory
             // 
-            this.btnDumpMemory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDumpMemory.Location = new System.Drawing.Point(88, 100);
+            this.btnDumpMemory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDumpMemory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnDumpMemory.Location = new System.Drawing.Point(202, 71);
             this.btnDumpMemory.Name = "btnDumpMemory";
-            this.btnDumpMemory.Size = new System.Drawing.Size(240, 23);
+            this.btnDumpMemory.Size = new System.Drawing.Size(126, 23);
             this.btnDumpMemory.TabIndex = 6;
-            this.btnDumpMemory.Text = "Dump Memory to File...";
+            this.btnDumpMemory.Text = "Dump to File...";
             this.btnDumpMemory.UseVisualStyleBackColor = true;
             this.btnDumpMemory.Click += new System.EventHandler(this.btnDumpMemory_Click);
             // 
@@ -771,11 +772,12 @@
             // 
             this.btnReadMemory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnReadMemory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.btnReadMemory.Location = new System.Drawing.Point(88, 71);
             this.btnReadMemory.Name = "btnReadMemory";
-            this.btnReadMemory.Size = new System.Drawing.Size(240, 23);
+            this.btnReadMemory.Size = new System.Drawing.Size(108, 23);
             this.btnReadMemory.TabIndex = 2;
-            this.btnReadMemory.Text = "Read Memory";
+            this.btnReadMemory.Text = "<-- Dump";
             this.btnReadMemory.UseVisualStyleBackColor = true;
             this.btnReadMemory.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -825,12 +827,15 @@
             // splitContainer6
             // 
             this.splitContainer6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer6.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer6.IsSplitterFixed = true;
             this.splitContainer6.Location = new System.Drawing.Point(3, 3);
             this.splitContainer6.Name = "splitContainer6";
             this.splitContainer6.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // splitContainer6.Panel1
             // 
+            this.splitContainer6.Panel1.Controls.Add(this.btnRevert);
             this.splitContainer6.Panel1.Controls.Add(this.btnRefresh);
             this.splitContainer6.Panel1.Controls.Add(this.btnLoadCT);
             this.splitContainer6.Panel1.Controls.Add(this.btnApply);
@@ -838,10 +843,22 @@
             // 
             // splitContainer6.Panel2
             // 
+            this.splitContainer6.Panel2.BackColor = System.Drawing.Color.Transparent;
             this.splitContainer6.Panel2.Controls.Add(this.lvCEMemory);
             this.splitContainer6.Size = new System.Drawing.Size(700, 158);
-            this.splitContainer6.SplitterDistance = 34;
+            this.splitContainer6.SplitterDistance = 29;
             this.splitContainer6.TabIndex = 2;
+            // 
+            // btnRevert
+            // 
+            this.btnRevert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRevert.Location = new System.Drawing.Point(445, 3);
+            this.btnRevert.Name = "btnRevert";
+            this.btnRevert.Size = new System.Drawing.Size(123, 23);
+            this.btnRevert.TabIndex = 7;
+            this.btnRevert.Text = "Revert";
+            this.btnRevert.UseVisualStyleBackColor = true;
+            this.btnRevert.Click += new System.EventHandler(this.btnRevert_Click);
             // 
             // btnRefresh
             // 
@@ -880,7 +897,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txNewValue.Location = new System.Drawing.Point(261, 5);
             this.txNewValue.Name = "txNewValue";
-            this.txNewValue.Size = new System.Drawing.Size(307, 20);
+            this.txNewValue.Size = new System.Drawing.Size(178, 20);
             this.txNewValue.TabIndex = 2;
             // 
             // lvCEMemory
@@ -896,7 +913,7 @@
             this.lvCEMemory.Location = new System.Drawing.Point(0, 0);
             this.lvCEMemory.MultiSelect = false;
             this.lvCEMemory.Name = "lvCEMemory";
-            this.lvCEMemory.Size = new System.Drawing.Size(700, 120);
+            this.lvCEMemory.Size = new System.Drawing.Size(700, 125);
             this.lvCEMemory.TabIndex = 1;
             this.lvCEMemory.UseCompatibleStateImageBehavior = false;
             this.lvCEMemory.View = System.Windows.Forms.View.Details;
@@ -992,6 +1009,7 @@
             // 
             // splitContainer5.Panel1
             // 
+            this.splitContainer5.Panel1.Controls.Add(this.button2);
             this.splitContainer5.Panel1.Controls.Add(this.txFilter);
             this.splitContainer5.Panel1.Controls.Add(this.label3);
             // 
@@ -1009,7 +1027,7 @@
             this.txFilter.Enabled = false;
             this.txFilter.Location = new System.Drawing.Point(41, 3);
             this.txFilter.Name = "txFilter";
-            this.txFilter.Size = new System.Drawing.Size(670, 20);
+            this.txFilter.Size = new System.Drawing.Size(537, 20);
             this.txFilter.TabIndex = 4;
             // 
             // label3
@@ -1041,6 +1059,31 @@
             this.diagBrowseCT.FileName = "openFileDialog1";
             this.diagBrowseCT.Filter = "Cheat Engine Tables (*.CT)|*.ct";
             this.diagBrowseCT.Title = "Load cheat table";
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(584, 1);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(127, 23);
+            this.button2.TabIndex = 6;
+            this.button2.Text = "Copy All";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click_1);
+            // 
+            // txDisassembly
+            // 
+            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
+            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
+            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
+            this.txDisassembly.Name = "txDisassembly";
+            this.txDisassembly.ReadOnly = true;
+            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.txDisassembly.Size = new System.Drawing.Size(714, 156);
+            this.txDisassembly.TabIndex = 1;
+            this.txDisassembly.Text = "";
             // 
             // Form1
             // 
@@ -1192,6 +1235,9 @@
         private System.Windows.Forms.Button btnLoadCT;
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Button btnRevert;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }
 

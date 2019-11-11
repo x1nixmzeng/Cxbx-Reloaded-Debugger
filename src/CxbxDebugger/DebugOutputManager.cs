@@ -8,7 +8,8 @@ namespace CxbxDebugger
 {
     class DebugOutputManager
     {
-        List<string> DebugInfo = new List<string>();
+        string LastString = string.Empty;
+        uint LastStringDupes = 1;
         ListBox Handler;
 
         public DebugOutputManager(ListBox Target)
@@ -21,21 +22,49 @@ namespace CxbxDebugger
             // TODO: filter
         }
 
+        public List<string> Lines { get; private set; } = new List<string>();
+
         public void AddLine(string Message)
         {
-            DebugInfo.Add(Message);
+            bool immediateDupe = false;
 
-            if ( Handler.InvokeRequired)
+            if (LastString == Message)
+            {
+                // Bump the number of times this was duplicated
+                ++LastStringDupes;
+
+                immediateDupe = true;
+            }
+            else
+            {
+                LastString = Message;
+                LastStringDupes = 1;
+
+                Lines.Add(Message);
+            }
+
+            if (Handler.InvokeRequired)
             {
                 Handler.Invoke(new MethodInvoker(delegate ()
                 {
-                    Handler.Items.Insert(0, Message);
+                    if (immediateDupe)
+                        HandleDupe();
+                    else
+                        Handler.Items.Insert(0, Message);
                 }));
             }
             else
             {
-                Handler.Items.Insert(0, Message);
+                if (immediateDupe)
+                    HandleDupe();
+                else
+                    Handler.Items.Insert(0, Message);
             }
+        }
+
+        private void HandleDupe()
+        {
+            Handler.Items[0] = $"{LastString} ({LastStringDupes} dupes)";
         }
     }
 }

@@ -74,7 +74,7 @@ namespace VsChromium.Core.Win32.Processes
 
         // x1nix: added
         [DllImport("kernel32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, uint nSize, out int lpNumberOfBytesWritten);
 
         [DllImport("ntdll.dll", SetLastError = true)]
@@ -97,5 +97,10 @@ namespace VsChromium.Core.Win32.Processes
         // x1nix: added
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool TerminateProcess(SafeProcessHandle hProcess, uint uExitCode);
+
+        // x1nix: added
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FlushInstructionCache(IntPtr hProcess, IntPtr lpBaseAddress, uint dwSize);
     }
 }

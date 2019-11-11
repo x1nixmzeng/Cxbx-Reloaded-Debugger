@@ -9,6 +9,9 @@ namespace CxbxDebugger
     {
         static public bool ReadNumeric(string Text, ref int Out)
         {
+            if (string.IsNullOrEmpty(Text))
+                return false;
+
             if (int.TryParse(Text, out Out))
             {
                 return true;
@@ -19,6 +22,9 @@ namespace CxbxDebugger
 
         static public bool ReadNumeric(string Text, ref uint Out)
         {
+            if (string.IsNullOrEmpty(Text))
+                return false;
+
             if (uint.TryParse(Text, out Out))
             {
                 return true;
@@ -29,6 +35,9 @@ namespace CxbxDebugger
 
         static public bool ReadHex(string Text, ref uint Out)
         {
+            if (string.IsNullOrEmpty(Text))
+                return false;
+
             try
             {
                 if (Text.StartsWith("0x"))
@@ -39,19 +48,24 @@ namespace CxbxDebugger
                 Out = Convert.ToUInt32(Text, 16);
                 return true;
             }
-            catch (Exception) { }
+            catch
+            { }
 
             return false;
         }
 
         static public bool ReadByte(string Text, ref byte Out)
         {
+            if (string.IsNullOrEmpty(Text))
+                return false;
+
             try
             {
                 Out = Convert.ToByte(Text, 16);
                 return true;
             }
-            catch (Exception) { }
+            catch
+            { }
 
             return false;
         }

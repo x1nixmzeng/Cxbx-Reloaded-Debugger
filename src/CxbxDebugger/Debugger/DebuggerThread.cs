@@ -2,10 +2,12 @@
 //
 
 using System;
+using System.Diagnostics;
 using WinProcesses = VsChromium.Core.Win32.Processes;
 
 namespace CxbxDebugger
 {
+    [DebuggerDisplay("ID = {ThreadID} Name = {DebugName}")]
     public class DebuggerThread
     {
         public DebuggerProcess OwningProcess { get; set; }
@@ -101,22 +103,63 @@ namespace CxbxDebugger
             uint ebp = ContextCache.ebp;
 
             CallstackCache = new DebuggerCallstack();
-            CallstackCache.AddFrame(new DebuggerStackFrame(new IntPtr(ContextCache.eip), new IntPtr(ebp), new IntPtr(ContextCache.esp)));
+            CallstackCache.AddFrame(new DebuggerStackFrame(ContextCache));
 
+            // Walk the stack to find the return address of the previous call
+            // This only works for specific calling conventions
             uint ReturnAddr = 0;
             do
             {
-                if (!OwningProcess.ReadMemory(new IntPtr(ebp + 4), ref ReturnAddr))
-                    break;
-                if (!OwningProcess.ReadMemory(new IntPtr(ebp), ref ebp))
-                    break;
+                try
+                {
+                    if (!OwningProcess.ReadMemory(new IntPtr(ebp + 4), ref ReturnAddr))
+                        break;
+                    if (!OwningProcess.ReadMemory(new IntPtr(ebp), ref ebp))
+                        break;
 
-                if (ebp == 0 || ReturnAddr == ebp)
-                    break;
+                    if (ebp == 0 || ReturnAddr == ebp)
+                        break;
 
-                CallstackCache.AddFrame(new DebuggerStackFrame(new IntPtr(ReturnAddr), new IntPtr(ebp)));
+                    CallstackCache.AddFrame(new DebuggerStackFrame(ReturnAddr, ebp));
+                }
+                catch
+                {
+                    break;
+                }
             }
             while (CallstackCache.CanCollect);
+        }
+
+        public void ModifyPC(uint pc)
+        {
+            if (NativeMethods.GetThreadContext(Handle, ref ContextCache))
+            {
+                var oldEip = ContextCache.eip;
+                ContextCache.eip = pc;
+
+                if (!NativeMethods.SetThreadContext(Handle, ref ContextCache))
+                {
+                    ContextCache.eip = oldEip;
+                }
+            }
+        }
+
+        public void SetSingleStepTrap(bool enabled)
+        {
+            if (NativeMethods.GetThreadContext(Handle, ref ContextCache))
+            {
+                Extendedx86ContextFlags newFlags = new Extendedx86ContextFlags();
+                newFlags = ContextCache.eFlags;
+
+                if(enabled)
+                    newFlags = newFlags | Extendedx86ContextFlags.Trap;
+                else
+                    newFlags &= ~Extendedx86ContextFlags.Trap;
+
+                ContextCache.eFlags = newFlags;
+
+                NativeMethods.SetThreadContext(Handle, ref ContextCache);
+            }
         }
     }
 }

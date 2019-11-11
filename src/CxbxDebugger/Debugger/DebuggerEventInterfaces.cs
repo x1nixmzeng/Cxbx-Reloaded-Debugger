@@ -40,6 +40,7 @@ namespace CxbxDebugger
     {
         bool OnAccessViolation(DebuggerThread Thread, uint Code, uint Address);
         void OnBreakpoint(DebuggerThread Thread, uint Address, uint Code, bool FirstChance);
+        void OnSingleStep(DebuggerThread Thread);
     }
 
     public interface IDebuggerFileEvents

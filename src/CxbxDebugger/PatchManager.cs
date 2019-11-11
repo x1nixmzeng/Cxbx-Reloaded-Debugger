@@ -2,6 +2,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace CxbxDebugger
@@ -17,7 +18,7 @@ namespace CxbxDebugger
         Array
     };
 
-    struct Patch
+    class Patch
     {
         public PatchType DisplayAs { get; set; }
         public string Name { get; set; }
@@ -27,10 +28,38 @@ namespace CxbxDebugger
         public byte[] Patched { get; set; }
     };
 
-    class PatchManager : IDebuggerProcessEvents, IDebuggerModuleEvents
+    class PatchManager : IDebuggerProcessEvents, IDebuggerModuleEvents, IDebuggerThreadEvents
     {
-        public List<Patch> Data = new List<Patch>();
-        public List<Patch> Assembly = new List<Patch>();
+        private List<Patch> Data = new List<Patch>();
+        private List<Patch> Assembly = new List<Patch>();
+
+        public IEnumerable<Patch> DataPatches { get { return Data; } }
+
+        public IEnumerable<Patch> AssemblyPatches { get { return Assembly; } }
+
+        public void AddByte(string Name, uint Offset, byte Value)
+        {
+            Patch DataPatch = new Patch();
+
+            DataPatch.DisplayAs = PatchType.Byte;
+            DataPatch.Name = Name;
+            DataPatch.Module = "";
+            DataPatch.Offset = Offset;
+            DataPatch.Original = null;
+            DataPatch.Patched = new byte[] { Value };
+
+            AddDataPatch(DataPatch);
+        }
+
+        public void AddDataPatch(Patch DataPatch)
+        {
+            Data.Add(DataPatch);
+        }
+
+        public void AddAssemblyPatch(Patch AssemblyPatch)
+        {
+            Assembly.Add(AssemblyPatch);
+        }
 
         public void OnProcessCreate(DebuggerProcess Process)
         {
@@ -46,7 +75,22 @@ namespace CxbxDebugger
 
         public void OnModuleUnloaded(DebuggerModule Module) { }
 
-        static int PatchSize(Patch PatchItem)
+        public void OnThreadCreate(DebuggerThread Thread)
+        {
+            // todo: check out base address of this?
+        }
+
+        public void OnThreadExit(DebuggerThread Thread, uint ExitCode)
+        {
+            // todo: check out base address of this?
+        }
+
+        public void OnThreadNamed(DebuggerThread Thread)
+        {
+            // todo: check out base address of this?
+        }
+
+        static int PatchSize(ref Patch PatchItem)
         {
             if (PatchItem.Original != null)
                 return PatchItem.Original.Length;
@@ -111,14 +155,100 @@ namespace CxbxDebugger
             return Result;
         }
 
-        public string Read(DebuggerProcess OwningProcess, Patch PatchItem)
+        /// <summary>
+        /// Format the patched data bytes
+        /// </summary>
+        /// <param name="PatchItem"></param>
+        /// <returns></returns>
+        public string GetPatchedData(Patch PatchItem)
         {
-            int Size = PatchSize(PatchItem);
-            if (Size == 0)
-                return "";
+            if (PatchItem.Patched != null)
+            {
+                return Format(PatchItem.DisplayAs, PatchItem.Patched);
+            }
 
-            byte[] Current = OwningProcess.ReadMemoryBlock(new IntPtr(PatchItem.Offset), (uint)Size);
-            return Format(PatchItem.DisplayAs, Current);
+            return "??";
+        }
+
+        /// <summary>
+        /// Format the original data bytes
+        /// </summary>
+        /// <param name="PatchItem"></param>
+        /// <returns></returns>
+        public string GetOriginalData(Patch PatchItem)
+        {
+            if (PatchItem.Original != null)
+            {
+                return Format(PatchItem.DisplayAs, PatchItem.Original);
+            }
+
+            return "??";
+        }
+
+        /// <summary>
+        /// Read original bytes and patch, if possible
+        /// </summary>
+        /// <param name="OwningProcess"></param>
+        public void SetupDataPatches(DebuggerProcess OwningProcess)
+        {
+            Data.ForEach(x => Setup(OwningProcess, x));
+        }
+
+        /// <summary>
+        /// Re-read original bytes and patch, if possible
+        /// </summary>
+        /// <param name="OwningProcess"></param>
+        public void UpdateDataPatches(DebuggerProcess OwningProcess)
+        {
+            Data.ForEach(x => Read(OwningProcess, x));
+            Data.ForEach(x => Apply(OwningProcess, x));
+        }
+
+        /// <summary>
+        /// Re-read original bytes of all data patches
+        /// </summary>
+        /// <param name="OwningProcess"></param>
+        public void RefreshDataPatches(DebuggerProcess OwningProcess)
+        {
+            Data.ForEach(x => Read(OwningProcess, x));
+        }
+
+        private void Apply(DebuggerProcess OwningProcess, Patch PatchItem)
+        {
+            int Size = PatchTypeLength(PatchItem.DisplayAs);
+
+            // Repatch
+            if (PatchItem.Original?.Length == Size && PatchItem.Patched?.Length == Size)
+            {
+                OwningProcess.WriteMemoryBlock(new IntPtr(PatchItem.Offset), PatchItem.Patched);
+            }
+        }
+
+        private void Setup(DebuggerProcess OwningProcess, Patch PatchItem)
+        {
+            if (PatchItem.Original == null)
+            {
+                int Size = PatchSize(ref PatchItem);
+                if (Size > 0)
+                {
+                    byte[] Current = OwningProcess.ReadMemoryBlock(new IntPtr(PatchItem.Offset), (uint)Size);
+                    if (Current != null)
+                    {
+                        PatchItem.Original = Current;
+                        Apply(OwningProcess, PatchItem);
+                    }
+                }
+            }
+        }
+
+        private void Read(DebuggerProcess OwningProcess, Patch PatchItem)
+        {
+            int Size = PatchSize(ref PatchItem);
+            if (Size > 0)
+            {
+                byte[] Current = OwningProcess.ReadMemoryBlock(new IntPtr(PatchItem.Offset), (uint)Size);
+                PatchItem.Original = Current;
+            }
         }
 
         public bool Write(DebuggerProcess OwningProcess, Patch PatchItem, string NewValue)

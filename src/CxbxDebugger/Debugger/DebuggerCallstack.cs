@@ -8,24 +8,40 @@ namespace CxbxDebugger
 {
     public class DebuggerStackFrame
     {
-        public IntPtr PC { get; }
-        public IntPtr Base { get; }
-        public IntPtr Stack { get; }
-        
-        // TOOD Resolve symbol for this frame
+        public uint edi { get; } = 0;
+        public uint esi { get; } = 0;
+        public uint ebx { get; } = 0;
+        public uint edx { get; } = 0;
+        public uint ecx { get; } = 0;
+        public uint eax { get; } = 0;
+        public uint ebp { get; } = 0;
+        public uint eip { get; } = 0;
+        public uint esp { get; } = 0;
 
-        public DebuggerStackFrame(IntPtr EIP, IntPtr EBP, IntPtr ESP)
+        public IntPtr PC { get { return new IntPtr(eip); } }
+        public IntPtr Base { get { return new IntPtr(ebp); } }
+        public IntPtr Stack { get { return new IntPtr(esp); } }
+
+        public DebuggerStackFrame()
+        { }
+
+        public DebuggerStackFrame(CONTEXT_x86 context)
         {
-            PC = EIP;
-            Base = EBP;
-            Stack = ESP;
+            edi = context.edi;
+            esi = context.esi;
+            ebx = context.ebx;
+            edx = context.edx;
+            ecx = context.ecx;
+            eax = context.eax;
+            ebp = context.ebp;
+            eip = context.eip;
+            esp = context.esp;
         }
 
-        public DebuggerStackFrame(IntPtr EIP, IntPtr EBP)
+        public DebuggerStackFrame(uint eip, uint ebp)
         {
-            PC = EIP;
-            Base = EBP;
-            Stack = IntPtr.Zero;
+            this.eip = eip;
+            this.ebp = ebp;
         }
     }
 

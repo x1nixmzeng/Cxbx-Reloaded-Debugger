@@ -17,6 +17,7 @@ namespace CxbxDebugger
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+#if !DEBUG
             string[] args = Environment.GetCommandLineArgs();
             if( args.Length == 1 )
             {
@@ -25,6 +26,7 @@ namespace CxbxDebugger
                 Application.Exit();
             }
             else
+#endif
             {
                 Application.Run(new Form1());
             }

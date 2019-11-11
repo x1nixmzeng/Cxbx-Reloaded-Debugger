@@ -135,27 +135,49 @@ namespace CxbxDebugger
             return true;
         }
 
-        public string ReadString(IntPtr Address)
+        // Read whole block size
+        public string ReadString2(IntPtr Address, uint blockSize = 256)
         {
             if (Address == IntPtr.Zero)
                 return "";
 
-            List<byte> StringData = new List<byte>();
+            var data = ReadMemoryBlock(Address, blockSize);
+            if (data == null)
+                return "";
 
-            byte chr = 0;
-            while (true)
-            {
-                if (!ReadMemory(Address, ref chr))
-                    break;
+            var result = Encoding.UTF8.GetString(data);
+            var ntIndex = result.IndexOf('\0');
+            if (ntIndex != -1)
+                return result.Substring(0, ntIndex);
 
-                if (chr == 0)
-                    break;
+            // else there is more data
+            result += " (truncated)";
 
-                Address += sizeof(byte);
-                StringData.Add(chr);
-            }
+            return result;
+        }
 
-            return Encoding.ASCII.GetString(StringData.ToArray());
+        public string ReadString(IntPtr Address)
+        {
+            return ReadString2(Address);
+            //if (Address == IntPtr.Zero)
+            //    return "";
+
+            //List<byte> StringData = new List<byte>();
+
+            //byte chr = 0;
+            //while (true)
+            //{
+            //    if (!ReadMemory(Address, ref chr))
+            //        break;
+
+            //    if (chr == 0)
+            //        break;
+
+            //    Address += sizeof(byte);
+            //    StringData.Add(chr);
+            //}
+
+            //return Encoding.ASCII.GetString(StringData.ToArray());
         }
 
         public string ReadWString(IntPtr Address)
@@ -221,15 +243,23 @@ namespace CxbxDebugger
 
         private bool WriteMemoryInternal(IntPtr Address, byte[] Data)
         {
+            Console.WriteLine($"Writing {Data.Length} bytes to {Address.ToInt32()}");
+
             int numWritten = 0;
-            return WinProcesses.NativeMethods.WriteProcessMemory
+            if( WinProcesses.NativeMethods.WriteProcessMemory
                 (
                     Handle,
                     Address,
                     Data,
                     (uint)Data.Length,
                     out numWritten
-                );
+                ))
+            {
+                // Flush the instruction cache; if the CPU does not detect the write it may execute the old code
+                return WinProcesses.NativeMethods.FlushInstructionCache(Handle, Address, (uint)Data.Length);
+            }
+
+            return false;
         }
 
         public void WriteMemory<T>(IntPtr Address, T Value)

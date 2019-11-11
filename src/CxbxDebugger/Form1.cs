@@ -7,6 +7,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Linq;
 using cs_x86;
 
 namespace CxbxDebugger
@@ -28,6 +29,9 @@ namespace CxbxDebugger
         FileWatchManager fileWatchMan;
         DebugOutputManager debugStrMan;
         PatchManager patchMan;
+        Extensions.ExtensionManager extensionManager;
+
+        Patch applyBreakpointOnStep;
 
         List<DebuggerMessages.FileOpened> FileHandles = new List<DebuggerMessages.FileOpened>();
 
@@ -39,11 +43,13 @@ namespace CxbxDebugger
 
             string[] args = Environment.GetCommandLineArgs();
 
+#if !DEBUG
             // Arguments are expected before the Form is created
             if (args.Length < 2)
             {
                 throw new Exception("Incorrect usage");
             }
+#endif
 
             var items = new List<string>(args.Length - 1);
             for (int i = 1; i < args.Length; ++i)
@@ -77,6 +83,7 @@ namespace CxbxDebugger
             fileWatchMan = new FileWatchManager(clbBreakpoints);
             debugStrMan = new DebugOutputManager(lbDebug);
             patchMan = new PatchManager();
+            extensionManager = new Extensions.ExtensionManager();
         }
 
         private void OnDisassemblyNavigation(object sender, InlineLinkClickedEventArgs e)
@@ -304,7 +311,7 @@ namespace CxbxDebugger
             return MessageBox.Show(Message, "Cxbx Debugger", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
-        private void DebugBreakpoint(DebuggerModule Module, uint Address)
+        private void DebugBreakpoint(DebuggerThread Thread, DebuggerModule Module, uint Address)
         {
             Invoke(new MethodInvoker(delegate ()
             {
@@ -328,13 +335,59 @@ namespace CxbxDebugger
                 }
                 else
                 {
-                    string module_name = Path.GetFileName(Module.Path);
-                    Suspend(string.Format("Breakpoint hit in {0} at 0x{1:x}", module_name, Address));
+                    DebuggerInst.Trace();
 
-                    // Forces a refresh at the breakpoint address (not the callstack trace)
-                    DumpDisassembly(Address);
+                    var stackFrame = Thread.CallstackCache.StackFrames[0];
+                    var currentIp = stackFrame.eip;
+
+                    currentIp -= 1; // Size of the 0xcc instruction
+                    Thread.ModifyPC(currentIp);
+
+                    var patch = patchMan.DataPatches.FirstOrDefault(x => x.Offset == currentIp);
+                    if (patch == null)
+                        throw new Exception($"Failed to find breakpoint patch for address {currentIp}");
+
+                    if (patch.Original == null)
+                        throw new Exception($"Original memory is missing for breakpoint patch at address {currentIp}");
+
+                    // write back the single byte
+                    // note: original should not also be a breakpoint - or this will endlessly loop
+                    Thread.OwningProcess.WriteMemoryBlock(new IntPtr(currentIp), patch.Original);
+
+                    // Sets a single-step trap
+                    Thread.SetSingleStepTrap(true);
+
+                    // Save this patch instance - note how this isn's thread safe at all
+                    applyBreakpointOnStep = patch;
+
+                    //// todo: move to extension
+                    //{
+                    //    var hashedString = DebugThreads[0].OwningProcess.ReadString(new IntPtr(stackFrame.edx));
+                    //    OutputString(hashedString);
+                    //}
+                    
+                    Resume();
+
+                    ////Forces a refresh at the breakpoint address(not the callstack trace)
+                    //DumpDisassembly(Address);
+                }
+            }));
+        }
+
+        private void DebugSingleStep(DebuggerThread Thread)
+        {
+            Invoke(new MethodInvoker(delegate ()
+            {
+                if(applyBreakpointOnStep != null)
+                {
+                    var offset = applyBreakpointOnStep.Offset;
+                    
+                    Thread.OwningProcess.WriteMemoryBlock(new IntPtr(offset), applyBreakpointOnStep.Patched);
+
+                    applyBreakpointOnStep = null;
                 }
 
+                // otherwise, expose to ui?
             }));
         }
 
@@ -434,6 +487,9 @@ namespace CxbxDebugger
             {
                 frm.DebugLog(string.Format("Thread created {0}", Thread.ThreadID));
                 frm.DebugThreads.Add(Thread);
+
+                // We could fire an event if this thread is the known main system one
+                // This would allow breakpoints to be valid the Xbox memory region
             }
 
             public void OnThreadExit(DebuggerThread Thread, uint ExitCode)
@@ -496,8 +552,13 @@ namespace CxbxDebugger
                 var Module = frm.DebuggerInst.ResolveModule(Address);
                 if (Module != null)
                 {
-                    frm.DebugBreakpoint(Module, Address);
+                    frm.DebugBreakpoint(Thread, Module, Address);
                 }
+            }
+
+            public void OnSingleStep(DebuggerThread Thread)
+            {
+                frm.DebugSingleStep(Thread);
             }
 
             public void OnFileOpened(DebuggerMessages.FileOpened Info)
@@ -1036,24 +1097,38 @@ namespace CxbxDebugger
             HandleDisasmGo();
         }
 
+        private void SetupPatches()
+        {
+            if (MainProcess != null)
+            {
+                patchMan.SetupDataPatches(MainProcess);
+            }
+
+            RefreshPatches();
+        }
+
+        private void UpdatePatches()
+        {
+            if (MainProcess != null)
+            {
+                patchMan.UpdateDataPatches(MainProcess);
+            }
+
+            RefreshPatches();
+        }
+        
         private void RefreshPatches()
         {
             lvCEMemory.BeginUpdate();
             lvCEMemory.Items.Clear();
 
-            foreach (Patch DataPatch in patchMan.Data)
+            foreach (Patch DataPatch in patchMan.DataPatches)
             {
                 var li = lvCEMemory.Items.Add(string.Format("{0} 0x{1:x}", DataPatch.Module, DataPatch.Offset));
+
                 li.SubItems.Add(DataPatch.Name);
                 li.SubItems.Add(string.Format("{0} byte(s)", DataPatch.Patched.Length));
-                if (MainProcess != null)
-                {
-                    li.SubItems.Add(patchMan.Read(MainProcess, DataPatch));
-                }
-                else
-                {
-                    li.SubItems.Add("??");
-                }
+                li.SubItems.Add(patchMan.GetOriginalData(DataPatch));
             }
 
             lvCEMemory.EndUpdate();
@@ -1061,7 +1136,7 @@ namespace CxbxDebugger
             lvCEAssembly.BeginUpdate();
             lvCEAssembly.Items.Clear();
 
-            foreach (Patch patch in patchMan.Assembly)
+            foreach (Patch patch in patchMan.AssemblyPatches)
             {
                 var li = lvCEAssembly.Items.Add(string.Format("{0} 0x{1:x}", patch.Module, patch.Offset));
                 li.SubItems.Add(patch.Name);
@@ -1123,7 +1198,7 @@ namespace CxbxDebugger
                             DataPatch.Original = null;
                             DataPatch.Patched = Nops(CheatEngine.Helpers.VariableSize(Entry.VariableType));
 
-                            patchMan.Data.Add(DataPatch);
+                            patchMan.AddDataPatch(DataPatch);
                         }
                     }
 
@@ -1138,7 +1213,7 @@ namespace CxbxDebugger
                         DataPatch.Original = Entry.Actual;
                         DataPatch.Patched = Nops(Entry.Actual.Length);
 
-                        patchMan.Assembly.Add(DataPatch);
+                        patchMan.AddAssemblyPatch(DataPatch);
                     }
 
                     DebugLog(string.Format("Loaded {0} auto-assembler entries", ct_data.CodeEntires.Count));
@@ -1172,11 +1247,9 @@ namespace CxbxDebugger
                 DataPatch.Name = string.Format("Patched {0}", PatchType);
                 DataPatch.Module = "";
                 DataPatch.Offset = addr;
-
-                // TODO: Read original memory at this location
-                DataPatch.Original = Nops(PatchSize);
+                DataPatch.Original = null;
                 DataPatch.Patched = Nops(PatchSize);
-                patchMan.Data.Add(DataPatch);
+                patchMan.AddDataPatch(DataPatch);
 
                 RefreshPatches();
             }
@@ -1203,7 +1276,9 @@ namespace CxbxDebugger
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            RefreshPatches();
+            // Setup will store original data AND refresh patches, which is better
+            SetupPatches();
+            //RefreshPatches();
         }
 
         private void InvokePatchTypeChange()
@@ -1221,18 +1296,62 @@ namespace CxbxDebugger
 
         private void button3_Click_1(object sender, EventArgs e)
         {
+            if (MainProcess == null)
+                return;
+
             if (lvCEMemory.SelectedIndices.Count != 1)
                 return;
 
             string Value = txNewValue.Text;
             if (Value.Length != 0)
             {
-                Patch DataPatch = patchMan.Data[lvCEMemory.SelectedIndices[0]];
-                if (patchMan.Write(MainProcess, DataPatch, Value))
+                //var DataPatch = patchMan.DataPatches.ElementAt(lvCEMemory.SelectedIndices[0]);
+                //if (DataPatch.Original == null)
+                //{
+                //    // If there is no original, attempt to re-set
+                //    patchMan.SetupDataPatches(MainProcess);
+                //}
+                
+                //if (patchMan.Write(MainProcess, DataPatch, Value))
+                //{
+                //    // uuh
+                //    RefreshPatches(false);
+                //}
+            }
+        }
+
+        private void btnRevert_Click(object sender, EventArgs e)
+        {
+            if (lvCEMemory.SelectedIndices.Count != 1)
+                return;
+
+            string Value = txNewValue.Text;
+            if (Value.Length != 0)
+            {
+                Patch DataPatch = patchMan.DataPatches.ElementAt(lvCEMemory.SelectedIndices[0]);
+
+                IntPtr PatchAddr = new IntPtr(DataPatch.Offset);
+                if (MainProcess.WriteMemoryBlock(PatchAddr, DataPatch.Original))
                 {
-                    RefreshPatches();
+                    UpdatePatches();
                 }
             }
+        }
+
+        private void button1_Click_3(object sender, EventArgs e)
+        {
+            uint addr = 0;
+            if (Common.ReadHex(txAddress.Text, ref addr))
+            {
+                patchMan.AddByte("Breakpoint", addr, 0xcc);
+                SetupPatches();
+            }
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            var lines = string.Join("\r\n", debugStrMan.Lines.ToList());
+            Clipboard.SetText(lines);            
         }
     }
 }

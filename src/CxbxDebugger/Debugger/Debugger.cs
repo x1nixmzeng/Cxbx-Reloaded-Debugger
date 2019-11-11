@@ -49,7 +49,7 @@ namespace CxbxDebugger
         DebuggerSymbolServer SymbolSrv;
         KernelProvider KernelSymbolProvider;
 
-        ManualResetEvent bpStall = new ManualResetEvent(false);
+        ManualResetEvent resumeEvent = new ManualResetEvent(false);
 
         bool bContinue = true;
         WinDebug.CONTINUE_STATUS ContinueStatus = WinDebug.CONTINUE_STATUS.DBG_CONTINUE;
@@ -101,7 +101,7 @@ namespace CxbxDebugger
         public void Dispose()
         {
             bContinue = false;
-            bpStall.Set();
+            resumeEvent.Set();
 
             // Remove all events
             GeneralEvents.Clear();
@@ -125,28 +125,19 @@ namespace CxbxDebugger
 
         public void Break()
         {
-            if (DebugInstance != null)
-            {
-                DebugInstance.MainProcess.Suspend();
-            }
+            DebugInstance?.MainProcess?.Suspend();
         }
 
         public void Resume()
         {
-            if (DebugInstance != null)
-            {
-                DebugInstance.MainProcess.Resume();
-            }
+            DebugInstance?.MainProcess?.Resume();
         }
 
         public void Trace()
         {
-            if (DebugInstance != null)
-            {
-                DebugInstance.MainProcess.Trace();
-            }
+            DebugInstance?.MainProcess?.Trace();
         }
-
+        
         public bool CanLaunch()
         {
             switch (State)
@@ -162,7 +153,7 @@ namespace CxbxDebugger
         private void SetupHLECacheProvider(string Filename)
         {
             var Provider = new HLECacheProvider();
-            if( Provider.Load(Filename) )
+            if (Provider.Load(Filename))
             {
                 SymbolSrv.RegisterProvider(Provider);
             }
@@ -637,20 +628,31 @@ namespace CxbxDebugger
                             uint BpCode = DebugInfo.ExceptionRecord.ExceptionCode;
                             bool FirstChance = (DebugInfo.dwFirstChance != 0);
 
-                            bpStall.Reset();
+                            // Callbacks will handle this
+                            resumeEvent.Reset();
 
                             foreach (IDebuggerExceptionEvents Event in ExceptionEvents)
                             {
                                 Event.OnBreakpoint(Thread, BpAddr, BpCode, FirstChance);
                             }
 
-                            bpStall.WaitOne();
+                            //resumeEvent.WaitOne().WaitOne();
                         }
                     }
                     break;
 
                 case ExceptionCode.SingleStep:
-                    // TODO Handle
+                    {
+                        var Thread = DebugInstance.MainProcess.FindThread((uint)DebugEvent.dwThreadId);
+                        if (Thread != null)
+                        {
+                            // so here we can skip over the breakpoint instruction and resume execution?!
+                            foreach (IDebuggerExceptionEvents Event in ExceptionEvents)
+                            {
+                                Event.OnSingleStep(Thread);
+                            }
+                        }
+                    }
                     break;
 
                 default:
@@ -661,7 +663,7 @@ namespace CxbxDebugger
         
         public void BreakpointContinue()
         {
-            bpStall.Set();
+            resumeEvent.Set();
         }
 
         public void RunThreaded()
@@ -721,6 +723,9 @@ namespace CxbxDebugger
                         // TODO: Handle
                         break;
                 }
+
+                // TODO: At the moment we suspend the app to skip over this
+                // INSTEAD we need to not call ContinueDebugEvent until we are done processing commands
 
                 // TODO: Stop doing this once we raise an exception
                 WinDebug.NativeMethods.ContinueDebugEvent(DbgEvt.dwProcessId, DbgEvt.dwThreadId, ContinueStatus);
