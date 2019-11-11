@@ -1,0 +1,3 @@
+[submodule "import/cs_x86"]
+	path = import/cs_x86
+	url = https://github.com/x1nixmzeng/cs_x86
