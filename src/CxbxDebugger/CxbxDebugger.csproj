@@ -83,8 +83,8 @@
     <Compile Include="Debugger\DebuggerSymbolServer.cs" />
     <Compile Include="Debugger\DebuggerThread.cs" />
     <Compile Include="DebugOutputManager.cs" />
-    <Compile Include="Extensions\ExtensionHandle.cs" />
-    <Compile Include="Extensions\ExtensionManager.cs" />
+    <Compile Include="Scripting\ScriptHandle.cs" />
+    <Compile Include="Scripting\ScriptManager.cs" />
     <Compile Include="FileEventManager.cs" />
     <Compile Include="FileWatchManager.cs" />
     <Compile Include="Form1.cs">
@@ -197,6 +197,10 @@
     <ProjectReference Include="..\..\import\cs_x86\cs_x86\cs_x86.csproj">
       <Project>{9131b025-5019-4dee-84a3-86d2703a81c0}</Project>
       <Name>cs_x86</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CxbxDebugger.Shared\CxbxDebugger.Shared.csproj">
+      <Project>{9169ed5d-3821-4f48-b416-2376d39a2d06}</Project>
+      <Name>CxbxDebugger.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

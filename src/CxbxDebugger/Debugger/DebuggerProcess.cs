@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using WinProcesses = VsChromium.Core.Win32.Processes;
+using CxbxDebugger.Shared;
 
 namespace CxbxDebugger
 {
-    public class DebuggerProcess : DebuggerModule
+    public class DebuggerProcess : DebuggerModule, IDebugger
     {
         public IntPtr Handle { get; set; }
         public uint ProcessID { get; set; }
@@ -315,6 +316,16 @@ namespace CxbxDebugger
                 return false;
 
             return WriteMemoryInternal(Address, Data);
+        }
+
+        public byte[] ReadMemoryChunk(uint Address, uint Size)
+        {
+            return ReadMemoryBlock(new IntPtr(Address), Size);
+        }
+
+        public bool WriteMemoryChunk(uint Address, byte[] data)
+        {
+            return WriteMemoryBlock(new IntPtr(Address), data);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using cs_x86;
+using CxbxDebugger.Shared;
 
 namespace CxbxDebugger
 {
@@ -29,7 +30,8 @@ namespace CxbxDebugger
         FileWatchManager fileWatchMan;
         DebugOutputManager debugStrMan;
         PatchManager patchMan;
-        Extensions.ExtensionManager extensionManager;
+        ScriptManager scriptMan;
+        ScriptHandle onBreakpointScript = ScriptHandle.Invalid();
 
         Patch applyBreakpointOnStep;
 
@@ -83,7 +85,7 @@ namespace CxbxDebugger
             fileWatchMan = new FileWatchManager(clbBreakpoints);
             debugStrMan = new DebugOutputManager(lbDebug);
             patchMan = new PatchManager();
-            extensionManager = new Extensions.ExtensionManager();
+            scriptMan = new ScriptManager();
         }
 
         private void OnDisassemblyNavigation(object sender, InlineLinkClickedEventArgs e)
@@ -360,16 +362,12 @@ namespace CxbxDebugger
                     // Save this patch instance - note how this isn's thread safe at all
                     applyBreakpointOnStep = patch;
 
-                    //// todo: move to extension
-                    //{
-                    //    var hashedString = DebugThreads[0].OwningProcess.ReadString(new IntPtr(stackFrame.edx));
-                    //    OutputString(hashedString);
-                    //}
-                    
-                    Resume();
+                    if (onBreakpointScript.IsValid)
+                    {
+                        onBreakpointScript.Invoke(currentIp, new DebuggerEngine(MainProcess));
+                    }
 
-                    ////Forces a refresh at the breakpoint address(not the callstack trace)
-                    //DumpDisassembly(Address);
+                    Resume();
                 }
             }));
         }
@@ -1352,6 +1350,36 @@ namespace CxbxDebugger
         {
             var lines = string.Join("\r\n", debugStrMan.Lines.ToList());
             Clipboard.SetText(lines);            
+        }
+
+        private void button3_Click_2(object sender, EventArgs e)
+        {
+            var sources = new string[] { textBox1.Text };
+            ScriptCompilerError[] errors = null;
+
+            onBreakpointScript = scriptMan.Compile(sources, ref errors);
+            label7.Text = $"Compiled: {onBreakpointScript.IsValid}";
+
+            listBox1.BeginUpdate();
+            listBox1.Items.Clear();
+
+            if (!onBreakpointScript.IsValid)
+            {
+                foreach (var error in errors)
+                {
+                    listBox1.Items.Add($"{error.Error}");
+                }
+            }
+
+            listBox1.EndUpdate();
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            if (onBreakpointScript.IsValid)
+            {
+                onBreakpointScript.Invoke(0xdeadf00d, new DebuggerEngine(MainProcess));
+            }
         }
     }
 }
