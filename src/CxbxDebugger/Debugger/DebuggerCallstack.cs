@@ -3,26 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using CxbxDebugger.Shared;
 
 namespace CxbxDebugger
 {
-    public class DebuggerStackFrame
+    public class DebuggerStackFrame : StackContext
     {
-        public uint edi { get; } = 0;
-        public uint esi { get; } = 0;
-        public uint ebx { get; } = 0;
-        public uint edx { get; } = 0;
-        public uint ecx { get; } = 0;
-        public uint eax { get; } = 0;
-        public uint ebp { get; } = 0;
-        public uint eip { get; } = 0;
-        public uint esp { get; } = 0;
-
-        public IntPtr PC { get { return new IntPtr(eip); } }
-        public IntPtr Base { get { return new IntPtr(ebp); } }
-        public IntPtr Stack { get { return new IntPtr(esp); } }
-
-        public DebuggerStackFrame()
+        public DebuggerStackFrame(uint eip, uint ebp)
+            : base(eip, ebp)
         { }
 
         public DebuggerStackFrame(CONTEXT_x86 context)
@@ -36,12 +24,6 @@ namespace CxbxDebugger
             ebp = context.ebp;
             eip = context.eip;
             esp = context.esp;
-        }
-
-        public DebuggerStackFrame(uint eip, uint ebp)
-        {
-            this.eip = eip;
-            this.ebp = ebp;
         }
     }
 

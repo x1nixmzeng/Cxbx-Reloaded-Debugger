@@ -12,6 +12,8 @@ namespace CxbxDebugger.Shared
     public interface IDebugger
     {
         byte[] ReadMemoryChunk(uint Address, uint Size);
-        bool WriteMemoryChunk(uint Address, byte[] data);        
+        bool WriteMemoryChunk(uint Address, byte[] data);
+
+        StackContext GetStackContext();
     }
 }

@@ -17,7 +17,15 @@ namespace CxbxDebugger
         public List<DebuggerModule> Modules { get; private set; }
         public List<DebuggerThread> Threads { get; set; }
 
+        /// <summary>
+        /// Main process thread
+        /// </summary>
         public DebuggerThread MainThread { get; set; }
+
+        /// <summary>
+        /// Thread of interest to current breakpoints
+        /// </summary>
+        public DebuggerThread ContextThread { get; set; }
 
         // Based on DebugProcess
         public DebuggerProcess()
@@ -247,7 +255,7 @@ namespace CxbxDebugger
             Console.WriteLine($"Writing {Data.Length} bytes to {Address.ToInt32()}");
 
             int numWritten = 0;
-            if( WinProcesses.NativeMethods.WriteProcessMemory
+            if (WinProcesses.NativeMethods.WriteProcessMemory
                 (
                     Handle,
                     Address,
@@ -326,6 +334,16 @@ namespace CxbxDebugger
         public bool WriteMemoryChunk(uint Address, byte[] data)
         {
             return WriteMemoryBlock(new IntPtr(Address), data);
+        }
+
+        public StackContext GetStackContext()
+        {
+            if (ContextThread?.CallstackCache.StackFrames?.Count > 0)
+            {
+                return ContextThread.CallstackCache.StackFrames[0];
+            }
+
+            return null;
         }
     }
 }

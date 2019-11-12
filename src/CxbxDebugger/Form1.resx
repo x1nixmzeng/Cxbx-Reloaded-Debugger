@@ -125,6 +125,7 @@
   </metadata>
   <data name="textBox1.Text" xml:space="preserve">
     <value>using System;
+using System.Text;
 using CxbxDebugger.Shared;
 
 namespace CxbxDebugger
@@ -133,7 +134,9 @@ namespace CxbxDebugger
     {
         public static void OnBreakpoint(uint Address, DebuggerEngine engine)
         {
-		Console.WriteLine("Hit breakpoint at " + Address);
+		var context = engine.StackContext;
+		var edxString = engine.ReadString(context.edx);
+		engine.DebugLog(edxString);
         }
     }
 }</value>

@@ -313,6 +313,22 @@ namespace CxbxDebugger
             return MessageBox.Show(Message, "Cxbx Debugger", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
+        class DebuggerTest : DebuggerEngine
+        {
+            DebugOutputManager outputManager;
+
+            public DebuggerTest(Form1 parent)
+                : base(parent?.MainProcess)
+            {
+                outputManager = parent.debugStrMan;
+            }
+
+            public override void DebugLog(string Message)
+            {
+                outputManager.AddLine(Message);
+            }
+        }
+
         private void DebugBreakpoint(DebuggerThread Thread, DebuggerModule Module, uint Address)
         {
             Invoke(new MethodInvoker(delegate ()
@@ -364,7 +380,9 @@ namespace CxbxDebugger
 
                     if (onBreakpointScript.IsValid)
                     {
-                        onBreakpointScript.Invoke(currentIp, new DebuggerEngine(MainProcess));
+                        MainProcess.ContextThread = Thread;
+
+                        onBreakpointScript.Invoke(currentIp, new DebuggerTest(this));
                     }
 
                     Resume();
