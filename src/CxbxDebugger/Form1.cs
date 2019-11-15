@@ -18,10 +18,10 @@ namespace CxbxDebugger
         Thread DebuggerWorkerThread;
         Debugger DebuggerInst;
         string[] CachedArgs;
-        string CachedTitle = "";
+
         bool SuspendedOnBp = false;
 
-        Xbox.XBE targetXbe = new Xbox.XBE();
+        Xbox.XBE targetXbe;
 
         DebuggerFormEvents DebugEvents;
 
@@ -81,13 +81,17 @@ namespace CxbxDebugger
                 }
             }
 
-            CachedTitle = targetXbe?.Title;
+            string targetName = "untitled";
 
-            Text = string.Format("{0} - Cxbx-Reloaded Debugger", CachedTitle);
+            // Rebrand with formatted title id
+            if (targetXbe != null)
+            {
+                Text = $"Cxbx-Reloaded Debugger - {targetXbe.Title} ({targetXbe.TitleId})";
+                targetName = targetXbe.TitleIdHex;
+            }
 
-            // todo: trigger managers with a filename
-            //LoadCheatTable(string.Format("{0}.ct", CachedTitle));
-
+            LoadCheatTable($"{targetName}.ct");
+            LoadScript($"{targetName}_script.txt");
 
             DebugEvents = new DebuggerFormEvents(this);
 
@@ -222,6 +226,8 @@ namespace CxbxDebugger
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
+            SaveScript();
+
             if (DebuggerWorkerThread != null)
             {
                 if (DebuggerWorkerThread.ThreadState == ThreadState.Running)
@@ -1206,13 +1212,32 @@ namespace CxbxDebugger
             return Str;
         }
 
-        private void LoadCheatTable(string filename)
-        {
-            string path = Directory.GetCurrentDirectory();
+        string lastLoadedScript = "";
 
+        private void LoadScript(string filename)
+        {
             if (File.Exists(filename))
             {
-                DebugLog(string.Format("Attempting to load \"{0}\"", filename));
+                DebugLog(string.Format("Loading script: \"{0}\"", filename));
+
+                txCsharpScript.Text = File.ReadAllText(filename);
+            }
+
+            lastLoadedScript = filename;
+        }
+
+        private void SaveScript()
+        {
+            DebugLog(string.Format("Saving script: \"{0}\"", lastLoadedScript));
+
+            File.WriteAllText(lastLoadedScript, txCsharpScript.Text);
+        }
+
+        private void LoadCheatTable(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                DebugLog(string.Format("Loading cheat engine file: \"{0}\"", filename));
 
                 CheatEngine.CheatTable ct_data = CheatEngine.CheatTableReader.FromFile(filename);
                 if (ct_data != null)
@@ -1389,7 +1414,7 @@ namespace CxbxDebugger
 
         private void button3_Click_2(object sender, EventArgs e)
         {
-            var sources = new string[] { textBox1.Text };
+            var sources = new string[] { txCsharpScript.Text };
             ScriptCompilerError[] errors = null;
 
             userScript = scriptMan.Compile(sources, ref errors);

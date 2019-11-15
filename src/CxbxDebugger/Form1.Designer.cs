@@ -52,6 +52,7 @@
             this.btnGo = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.cbDisAddr = new System.Windows.Forms.ComboBox();
+            this.txDisassembly = new CxbxDebugger.RicherTextBox();
             this.tabBreakpoints = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -118,10 +119,9 @@
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txCsharpScript = new System.Windows.Forms.TextBox();
             this.diagSaveMemory = new System.Windows.Forms.SaveFileDialog();
             this.diagBrowseCT = new System.Windows.Forms.OpenFileDialog();
-            this.txDisassembly = new CxbxDebugger.RicherTextBox();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.statusBar.SuspendLayout();
@@ -410,6 +410,21 @@
             this.cbDisAddr.TabIndex = 0;
             this.cbDisAddr.SelectedIndexChanged += new System.EventHandler(this.cbDisAddr_SelectedIndexChanged);
             this.cbDisAddr.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBox1_KeyDown);
+            // 
+            // txDisassembly
+            // 
+            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
+            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
+            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
+            this.txDisassembly.Name = "txDisassembly";
+            this.txDisassembly.ReadOnly = true;
+            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.txDisassembly.Size = new System.Drawing.Size(714, 156);
+            this.txDisassembly.TabIndex = 1;
+            this.txDisassembly.Text = "";
             // 
             // tabBreakpoints
             // 
@@ -1076,7 +1091,7 @@
             this.tabPage1.Controls.Add(this.checkBox1);
             this.tabPage1.Controls.Add(this.label7);
             this.tabPage1.Controls.Add(this.button3);
-            this.tabPage1.Controls.Add(this.textBox1);
+            this.tabPage1.Controls.Add(this.txCsharpScript);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -1139,21 +1154,21 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click_2);
             // 
-            // textBox1
+            // txCsharpScript
             // 
-            this.textBox1.AcceptsReturn = true;
-            this.textBox1.AcceptsTab = true;
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.txCsharpScript.AcceptsReturn = true;
+            this.txCsharpScript.AcceptsTab = true;
+            this.txCsharpScript.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBox1.Location = new System.Drawing.Point(139, 7);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(575, 121);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.Text = resources.GetString("textBox1.Text");
+            this.txCsharpScript.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txCsharpScript.Location = new System.Drawing.Point(139, 7);
+            this.txCsharpScript.Multiline = true;
+            this.txCsharpScript.Name = "txCsharpScript";
+            this.txCsharpScript.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txCsharpScript.Size = new System.Drawing.Size(575, 121);
+            this.txCsharpScript.TabIndex = 0;
+            this.txCsharpScript.Text = resources.GetString("txCsharpScript.Text");
             // 
             // diagSaveMemory
             // 
@@ -1164,21 +1179,6 @@
             this.diagBrowseCT.FileName = "openFileDialog1";
             this.diagBrowseCT.Filter = "Cheat Engine Tables (*.CT)|*.ct";
             this.diagBrowseCT.Title = "Load cheat table";
-            // 
-            // txDisassembly
-            // 
-            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
-            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
-            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
-            this.txDisassembly.Name = "txDisassembly";
-            this.txDisassembly.ReadOnly = true;
-            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.txDisassembly.Size = new System.Drawing.Size(714, 156);
-            this.txDisassembly.TabIndex = 1;
-            this.txDisassembly.Text = "";
             // 
             // Form1
             // 
@@ -1336,7 +1336,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txCsharpScript;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button button3;

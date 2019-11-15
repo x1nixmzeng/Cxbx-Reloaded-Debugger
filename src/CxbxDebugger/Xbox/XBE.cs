@@ -23,7 +23,11 @@ namespace CxbxDebugger.Xbox
         /// <summary>
         /// Formatted title id (in the format XX-123)
         /// </summary>
-        public string TitleId { get; private set; } = "";
+        public string TitleId { get; private set; } = "<unknown>";
+        /// <summary>
+        /// Formatted title id (as hex)
+        /// </summary>
+        public string TitleIdHex { get; private set; } = "";
         /// <summary>
         /// Extracted title string from metadata
         /// </summary>
@@ -125,7 +129,7 @@ namespace CxbxDebugger.Xbox
             return CleanString(str);
         }
 
-        private string GetFormattedTitle()
+        private string MakeFormattedTitleId()
         {
             var title1 = (char)((certificate.dwTitleId >> 24) & 0xFF);
             var title2 = (char)((certificate.dwTitleId >> 16) & 0xFF);
@@ -133,10 +137,15 @@ namespace CxbxDebugger.Xbox
             if (char.IsLetter(title1) && char.IsLetter(title2))
             {
                 var titleCount = (ushort)(certificate.dwTitleId & 0xFFFF);
-                return string.Format("{0}{1}-{2}", title1, title2, titleCount);
+                return string.Format("{0}{1}-{2:000}", title1, title2, titleCount);
             }
 
-            return certificate.dwTitleId.ToString();
+            return "<unknown>";
+        }
+
+        private string MakeHexTitleId()
+        {
+            return certificate.dwTitleId.ToString("x");
         }
 
         public bool Read(BinaryReader stream)
@@ -152,7 +161,8 @@ namespace CxbxDebugger.Xbox
             DebugPath = GetString(stream, header.dwDebugPathnameAddr, 100, Encoding.UTF8);
             DebugFilename = GetString(stream, header.dwDebugUnicodeFilenameAddr, 100, Encoding.Unicode);
 
-            TitleId = GetFormattedTitle();
+            TitleId = MakeFormattedTitleId();
+            TitleIdHex = MakeHexTitleId();
 
             return true;
         }
