@@ -1439,7 +1439,13 @@ namespace CxbxDebugger
             if (userScript.IsValid)
             {
                 userScript.OnBreakpoint(new DebuggerEngine(MainProcess), 0xdeadf00d);
+                MessageBox.Show("Ran successfully");
             }
+        }
+
+        private void btnScriptSave_Click(object sender, EventArgs e)
+        {
+            SaveScript();
         }
     }
 }

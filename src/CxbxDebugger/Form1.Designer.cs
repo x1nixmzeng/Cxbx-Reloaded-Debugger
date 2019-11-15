@@ -52,7 +52,6 @@
             this.btnGo = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.cbDisAddr = new System.Windows.Forms.ComboBox();
-            this.txDisassembly = new CxbxDebugger.RicherTextBox();
             this.tabBreakpoints = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -115,13 +114,15 @@
             this.lbDebug = new System.Windows.Forms.ListBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.button4 = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.btnScriptTest = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnScriptCompile = new System.Windows.Forms.Button();
             this.txCsharpScript = new System.Windows.Forms.TextBox();
             this.diagSaveMemory = new System.Windows.Forms.SaveFileDialog();
             this.diagBrowseCT = new System.Windows.Forms.OpenFileDialog();
+            this.txDisassembly = new CxbxDebugger.RicherTextBox();
+            this.splitContainer7 = new System.Windows.Forms.SplitContainer();
+            this.btnScriptSave = new System.Windows.Forms.Button();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.statusBar.SuspendLayout();
@@ -163,6 +164,10 @@
             this.splitContainer5.Panel2.SuspendLayout();
             this.splitContainer5.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).BeginInit();
+            this.splitContainer7.Panel1.SuspendLayout();
+            this.splitContainer7.Panel2.SuspendLayout();
+            this.splitContainer7.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbConsole
@@ -410,21 +415,6 @@
             this.cbDisAddr.TabIndex = 0;
             this.cbDisAddr.SelectedIndexChanged += new System.EventHandler(this.cbDisAddr_SelectedIndexChanged);
             this.cbDisAddr.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBox1_KeyDown);
-            // 
-            // txDisassembly
-            // 
-            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
-            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
-            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
-            this.txDisassembly.Name = "txDisassembly";
-            this.txDisassembly.ReadOnly = true;
-            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.txDisassembly.Size = new System.Drawing.Size(714, 156);
-            this.txDisassembly.TabIndex = 1;
-            this.txDisassembly.Text = "";
             // 
             // tabBreakpoints
             // 
@@ -1086,12 +1076,7 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.listBox1);
-            this.tabPage1.Controls.Add(this.button4);
-            this.tabPage1.Controls.Add(this.checkBox1);
-            this.tabPage1.Controls.Add(this.label7);
-            this.tabPage1.Controls.Add(this.button3);
-            this.tabPage1.Controls.Add(this.txCsharpScript);
+            this.tabPage1.Controls.Add(this.splitContainer7);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -1102,71 +1087,54 @@
             // 
             // listBox1
             // 
-            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(139, 134);
+            this.listBox1.Location = new System.Drawing.Point(3, 5);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(575, 30);
+            this.listBox1.Size = new System.Drawing.Size(708, 30);
             this.listBox1.TabIndex = 5;
             // 
-            // button4
+            // btnScriptTest
             // 
-            this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button4.Location = new System.Drawing.Point(220, 170);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 23);
-            this.button4.TabIndex = 4;
-            this.button4.Text = "Test";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click_1);
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(6, 8);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(127, 17);
-            this.checkBox1.TabIndex = 3;
-            this.checkBox1.Text = "Enable on breakpoint";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.btnScriptTest.Location = new System.Drawing.Point(84, 41);
+            this.btnScriptTest.Name = "btnScriptTest";
+            this.btnScriptTest.Size = new System.Drawing.Size(75, 23);
+            this.btnScriptTest.TabIndex = 4;
+            this.btnScriptTest.Text = "Test";
+            this.btnScriptTest.UseVisualStyleBackColor = true;
+            this.btnScriptTest.Click += new System.EventHandler(this.button4_Click_1);
             // 
             // label7
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(301, 175);
+            this.label7.Location = new System.Drawing.Point(246, 46);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(78, 13);
             this.label7.TabIndex = 2;
             this.label7.Text = "Compiled: false";
             // 
-            // button3
+            // btnScriptCompile
             // 
-            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button3.Location = new System.Drawing.Point(139, 170);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 1;
-            this.button3.Text = "Compile";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click_2);
+            this.btnScriptCompile.Location = new System.Drawing.Point(3, 41);
+            this.btnScriptCompile.Name = "btnScriptCompile";
+            this.btnScriptCompile.Size = new System.Drawing.Size(75, 23);
+            this.btnScriptCompile.TabIndex = 1;
+            this.btnScriptCompile.Text = "Compile";
+            this.btnScriptCompile.UseVisualStyleBackColor = true;
+            this.btnScriptCompile.Click += new System.EventHandler(this.button3_Click_2);
             // 
             // txCsharpScript
             // 
             this.txCsharpScript.AcceptsReturn = true;
             this.txCsharpScript.AcceptsTab = true;
-            this.txCsharpScript.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txCsharpScript.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txCsharpScript.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txCsharpScript.Location = new System.Drawing.Point(139, 7);
+            this.txCsharpScript.Location = new System.Drawing.Point(0, 0);
             this.txCsharpScript.Multiline = true;
             this.txCsharpScript.Name = "txCsharpScript";
             this.txCsharpScript.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txCsharpScript.Size = new System.Drawing.Size(575, 121);
+            this.txCsharpScript.Size = new System.Drawing.Size(714, 115);
             this.txCsharpScript.TabIndex = 0;
             this.txCsharpScript.Text = resources.GetString("txCsharpScript.Text");
             // 
@@ -1179,6 +1147,55 @@
             this.diagBrowseCT.FileName = "openFileDialog1";
             this.diagBrowseCT.Filter = "Cheat Engine Tables (*.CT)|*.ct";
             this.diagBrowseCT.Title = "Load cheat table";
+            // 
+            // txDisassembly
+            // 
+            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
+            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
+            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
+            this.txDisassembly.Name = "txDisassembly";
+            this.txDisassembly.ReadOnly = true;
+            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.txDisassembly.Size = new System.Drawing.Size(714, 156);
+            this.txDisassembly.TabIndex = 1;
+            this.txDisassembly.Text = "";
+            // 
+            // splitContainer7
+            // 
+            this.splitContainer7.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer7.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer7.IsSplitterFixed = true;
+            this.splitContainer7.Location = new System.Drawing.Point(3, 3);
+            this.splitContainer7.Name = "splitContainer7";
+            this.splitContainer7.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer7.Panel1
+            // 
+            this.splitContainer7.Panel1.Controls.Add(this.txCsharpScript);
+            // 
+            // splitContainer7.Panel2
+            // 
+            this.splitContainer7.Panel2.Controls.Add(this.btnScriptSave);
+            this.splitContainer7.Panel2.Controls.Add(this.btnScriptCompile);
+            this.splitContainer7.Panel2.Controls.Add(this.listBox1);
+            this.splitContainer7.Panel2.Controls.Add(this.label7);
+            this.splitContainer7.Panel2.Controls.Add(this.btnScriptTest);
+            this.splitContainer7.Size = new System.Drawing.Size(714, 190);
+            this.splitContainer7.SplitterDistance = 115;
+            this.splitContainer7.TabIndex = 6;
+            // 
+            // btnScriptSave
+            // 
+            this.btnScriptSave.Location = new System.Drawing.Point(165, 41);
+            this.btnScriptSave.Name = "btnScriptSave";
+            this.btnScriptSave.Size = new System.Drawing.Size(75, 23);
+            this.btnScriptSave.TabIndex = 6;
+            this.btnScriptSave.Text = "Save";
+            this.btnScriptSave.UseVisualStyleBackColor = true;
+            this.btnScriptSave.Click += new System.EventHandler(this.btnScriptSave_Click);
             // 
             // Form1
             // 
@@ -1242,7 +1259,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit();
             this.splitContainer5.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
+            this.splitContainer7.Panel1.ResumeLayout(false);
+            this.splitContainer7.Panel1.PerformLayout();
+            this.splitContainer7.Panel2.ResumeLayout(false);
+            this.splitContainer7.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer7)).EndInit();
+            this.splitContainer7.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1337,11 +1359,12 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TextBox txCsharpScript;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button btnScriptCompile;
+        private System.Windows.Forms.Button btnScriptTest;
         private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.SplitContainer splitContainer7;
+        private System.Windows.Forms.Button btnScriptSave;
     }
 }
 
