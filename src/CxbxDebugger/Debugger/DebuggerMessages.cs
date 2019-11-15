@@ -14,7 +14,7 @@ namespace CxbxDebugger
             FILE_OPENED = 0x00deed02,
             FILE_READ = 0x00deed03,
             FILE_CLOSED = 0x00deed04,
-            DEBUGGER_INIT = 0x00deed05,
+            //DEBUGGER_INIT = 0x00deed05, // now unused
             FILE_WRITE = 0x00deed06,
 
             OVERRIDE_EXCEPTION = 0x00ceed01,

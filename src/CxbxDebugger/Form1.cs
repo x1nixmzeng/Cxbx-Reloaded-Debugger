@@ -81,6 +81,14 @@ namespace CxbxDebugger
                 }
             }
 
+            CachedTitle = targetXbe?.Title;
+
+            Text = string.Format("{0} - Cxbx-Reloaded Debugger", CachedTitle);
+
+            // todo: trigger managers with a filename
+            //LoadCheatTable(string.Format("{0}.ct", CachedTitle));
+
+
             DebugEvents = new DebuggerFormEvents(this);
 
             SetDebugProcessActive(false);
@@ -323,20 +331,7 @@ namespace CxbxDebugger
                 }
             }
         }
-
-        private void DebugTitle(string Title)
-        {
-            Invoke(new MethodInvoker(delegate ()
-            {
-                CachedTitle = Title;
-
-                Text = string.Format("{0} - Cxbx-Reloaded Debugger", CachedTitle);
-
-                // This is done too late - modules are already loaded
-                //LoadCheatTable(string.Format("{0}.ct", CachedTitle));
-            }));
-        }
-
+        
         private bool DebugAsk(string Message)
         {
             return MessageBox.Show(Message, "Cxbx Debugger", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
@@ -519,12 +514,6 @@ namespace CxbxDebugger
             {
                 frm.SetDebugProcessActive(false);
                 frm.DebugLog("Ended debugging session");
-            }
-
-            public void OnDebugTitleLoaded(string Title)
-            {
-                frm.DebugLog(string.Format("Loaded title \"{0}\"", Title));
-                frm.DebugTitle(Title);
             }
 
             public void OnThreadCreate(DebuggerThread Thread)

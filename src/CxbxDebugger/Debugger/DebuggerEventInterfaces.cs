@@ -9,7 +9,6 @@ namespace CxbxDebugger
     {
         void OnDebugStart();
         void OnDebugEnd();
-        void OnDebugTitleLoaded(string Title);
     }
 
     public interface IDebuggerProcessEvents

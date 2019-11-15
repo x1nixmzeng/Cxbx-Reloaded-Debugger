@@ -572,23 +572,6 @@ namespace CxbxDebugger
                     }
                     break;
 
-                case (ExceptionCode)DebuggerMessages.ReportType.DEBUGGER_INIT:
-                    {
-                        var Thread = DebugInstance.MainProcess.FindThread((uint)DebugEvent.dwThreadId);
-                        if (Thread != null)
-                        {
-                            var Report = DebuggerMessages.GetDebuggerInitReport(Thread, DebugInfo.ExceptionRecord.ExceptionInformation);
-
-                            InitParams = Report;
-
-                            foreach (IDebuggerGeneralEvents Event in GeneralEvents)
-                            {
-                                Event.OnDebugTitleLoaded(InitParams.Title);
-                            }
-                        }
-                    }
-                    break;
-
                 case (ExceptionCode)DebuggerMessages.ReportType.MS_VC_EXCEPTION:
                     {
                         var Thread = DebugInstance.MainProcess.FindThread((uint)DebugEvent.dwThreadId);
