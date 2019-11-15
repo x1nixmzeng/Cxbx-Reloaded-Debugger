@@ -1,18 +1,42 @@
 ﻿// Written by x1nixmzeng for the Cxbx-Reloaded project
 //
 
-using System.Reflection;
 using CxbxDebugger.Shared;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace CxbxDebugger
 {
     class ScriptHandle
     {
-        MethodInfo GeneratedMethod;
+        static string OnBreakpointMethod = "OnBreakpoint";
+        static string OnFileOpenMethod = "OnFileOpen";
 
-        public ScriptHandle(MethodInfo method)
+        Dictionary<string, MethodInfo> MethodCache;
+
+        public ScriptHandle(Assembly compiledAssembly)
         {
-            GeneratedMethod = method;
+            if (compiledAssembly != null)
+            {
+                Type userScript = compiledAssembly.GetType("CxbxDebugger.UserScript");
+                if (userScript != null)
+                {
+                    MethodCache = new Dictionary<string, MethodInfo>();
+
+                    CacheScriptBinding(userScript, BindingFlags.Static | BindingFlags.Public, OnBreakpointMethod);
+                    CacheScriptBinding(userScript, BindingFlags.Static | BindingFlags.Public, OnFileOpenMethod);
+                }
+            }
+        }
+
+        private void CacheScriptBinding(Type userScript, BindingFlags bindingFlags, string methodName)
+        {
+            var methodBinding = userScript.GetMethod(methodName, bindingFlags);
+            if (methodBinding != null)
+            {
+                MethodCache.Add(methodName, methodBinding);
+            }
         }
 
         public static ScriptHandle Invalid()
@@ -20,14 +44,28 @@ namespace CxbxDebugger
             return new ScriptHandle(null);
         }
 
-        public void Invoke(uint Address, DebuggerEngine Engine)
+        public void OnBreakpoint(DebuggerEngine Engine, uint Address)
         {
-            try
+            Invoke(OnBreakpointMethod, new object[] { Engine, Address });
+        }
+
+        public void OnFileOpen(DebuggerEngine Engine, string Name)
+        {
+            Invoke(OnFileOpenMethod, new object[] { Engine, Name });
+        }
+
+        public void Invoke(string Name, object[] Params)
+        {
+            MethodInfo Method;
+            if (MethodCache.TryGetValue(Name, out Method))
             {
-                GeneratedMethod?.Invoke(null, new object[] { Address, Engine });
-            }
-            catch
-            {
+                try
+                {
+                    Method.Invoke(null, Params);
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -35,7 +73,7 @@ namespace CxbxDebugger
         {
             get
             {
-                return GeneratedMethod != null;
+                return MethodCache != null;
             }
         }
     };

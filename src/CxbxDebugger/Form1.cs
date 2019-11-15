@@ -31,7 +31,7 @@ namespace CxbxDebugger
         DebugOutputManager debugStrMan;
         PatchManager patchMan;
         ScriptManager scriptMan;
-        ScriptHandle onBreakpointScript = ScriptHandle.Invalid();
+        ScriptHandle userScript = ScriptHandle.Invalid();
 
         Patch applyBreakpointOnStep;
 
@@ -261,6 +261,15 @@ namespace CxbxDebugger
                 }
                 lvFileDetails.EndUpdate();
 
+                if (Event.Type == FileEventType.Opened)
+                {
+                    if (userScript.IsValid)
+                    {
+                        userScript.OnFileOpen(new DebuggerTest(this), Event.Name);
+                    }
+                }
+
+
                 switch (Event.Type)
                 {
 
@@ -378,11 +387,10 @@ namespace CxbxDebugger
                     // Save this patch instance - note how this isn's thread safe at all
                     applyBreakpointOnStep = patch;
 
-                    if (onBreakpointScript.IsValid)
+                    if (userScript.IsValid)
                     {
                         MainProcess.ContextThread = Thread;
-
-                        onBreakpointScript.Invoke(currentIp, new DebuggerTest(this));
+                        userScript.OnBreakpoint(new DebuggerTest(this), currentIp);
                     }
 
                     Resume();
@@ -1375,13 +1383,13 @@ namespace CxbxDebugger
             var sources = new string[] { textBox1.Text };
             ScriptCompilerError[] errors = null;
 
-            onBreakpointScript = scriptMan.Compile(sources, ref errors);
-            label7.Text = $"Compiled: {onBreakpointScript.IsValid}";
+            userScript = scriptMan.Compile(sources, ref errors);
+            label7.Text = $"Compiled: {userScript.IsValid}";
 
             listBox1.BeginUpdate();
             listBox1.Items.Clear();
 
-            if (!onBreakpointScript.IsValid)
+            if (!userScript.IsValid)
             {
                 foreach (var error in errors)
                 {
@@ -1394,9 +1402,9 @@ namespace CxbxDebugger
 
         private void button4_Click_1(object sender, EventArgs e)
         {
-            if (onBreakpointScript.IsValid)
+            if (userScript.IsValid)
             {
-                onBreakpointScript.Invoke(0xdeadf00d, new DebuggerEngine(MainProcess));
+                userScript.OnBreakpoint(new DebuggerEngine(MainProcess), 0xdeadf00d);
             }
         }
     }

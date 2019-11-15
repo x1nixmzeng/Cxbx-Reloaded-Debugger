@@ -132,11 +132,16 @@ namespace CxbxDebugger
 {
     public static class UserScript
     {
-        public static void OnBreakpoint(uint Address, DebuggerEngine engine)
+        public static void OnBreakpoint(DebuggerEngine engine, uint Address)
         {
 		var context = engine.StackContext;
 		var edxString = engine.ReadString(context.edx);
 		engine.DebugLog(edxString);
+        }
+
+        public static void OnFileOpen(DebuggerEngine engine, string Name)
+        {
+		engine.DebugLog("File Opened: " + Name);
         }
     }
 }</value>

@@ -64,10 +64,7 @@ namespace CxbxDebugger
             }
             else
             {
-                var cls = results.CompiledAssembly.GetType("CxbxDebugger.UserScript");
-
-                var method = cls.GetMethod("OnBreakpoint", BindingFlags.Static | BindingFlags.Public);
-                handle = new ScriptHandle(method);
+                handle = new ScriptHandle(results.CompiledAssembly);
             }
 
             return handle;
