@@ -21,6 +21,8 @@ namespace CxbxDebugger
         string CachedTitle = "";
         bool SuspendedOnBp = false;
 
+        Xbox.XBE targetXbe = new Xbox.XBE();
+
         DebuggerFormEvents DebugEvents;
 
         List<DebuggerThread> DebugThreads = new List<DebuggerThread>();
@@ -60,6 +62,24 @@ namespace CxbxDebugger
             }
 
             CachedArgs = items.ToArray();
+            
+            if (CachedArgs.Length > 3)
+            {
+                if (CachedArgs[1] == "/load" && File.Exists(CachedArgs[2]))
+                {
+                    var file = File.OpenRead(CachedArgs[2]);
+                    if (file.CanRead)
+                    {
+                        var currentXbe = new Xbox.XBE();
+                        if (currentXbe.Read(new BinaryReader(file)))
+                        {
+                            targetXbe = currentXbe;
+                        }
+
+                        file.Close();
+                    }
+                }
+            }
 
             DebugEvents = new DebuggerFormEvents(this);
 

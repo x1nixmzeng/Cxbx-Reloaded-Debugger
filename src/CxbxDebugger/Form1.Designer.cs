@@ -52,7 +52,6 @@
             this.btnGo = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.cbDisAddr = new System.Windows.Forms.ComboBox();
-            this.txDisassembly = new CxbxDebugger.RicherTextBox();
             this.tabBreakpoints = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
@@ -122,6 +121,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.diagSaveMemory = new System.Windows.Forms.SaveFileDialog();
             this.diagBrowseCT = new System.Windows.Forms.OpenFileDialog();
+            this.txDisassembly = new CxbxDebugger.RicherTextBox();
             this.toolStrip1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.statusBar.SuspendLayout();
@@ -410,21 +410,6 @@
             this.cbDisAddr.TabIndex = 0;
             this.cbDisAddr.SelectedIndexChanged += new System.EventHandler(this.cbDisAddr_SelectedIndexChanged);
             this.cbDisAddr.KeyDown += new System.Windows.Forms.KeyEventHandler(this.comboBox1_KeyDown);
-            // 
-            // txDisassembly
-            // 
-            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
-            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
-            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
-            this.txDisassembly.Name = "txDisassembly";
-            this.txDisassembly.ReadOnly = true;
-            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.txDisassembly.Size = new System.Drawing.Size(714, 156);
-            this.txDisassembly.TabIndex = 1;
-            this.txDisassembly.Text = "";
             // 
             // tabBreakpoints
             // 
@@ -1179,6 +1164,21 @@
             this.diagBrowseCT.FileName = "openFileDialog1";
             this.diagBrowseCT.Filter = "Cheat Engine Tables (*.CT)|*.ct";
             this.diagBrowseCT.Title = "Load cheat table";
+            // 
+            // txDisassembly
+            // 
+            this.txDisassembly.BackColor = System.Drawing.SystemColors.Window;
+            this.txDisassembly.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txDisassembly.Cursor = System.Windows.Forms.Cursors.Default;
+            this.txDisassembly.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txDisassembly.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txDisassembly.Location = new System.Drawing.Point(0, 0);
+            this.txDisassembly.Name = "txDisassembly";
+            this.txDisassembly.ReadOnly = true;
+            this.txDisassembly.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
+            this.txDisassembly.Size = new System.Drawing.Size(714, 156);
+            this.txDisassembly.TabIndex = 1;
+            this.txDisassembly.Text = "";
             // 
             // Form1
             // 
