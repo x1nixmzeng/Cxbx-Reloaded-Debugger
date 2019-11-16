@@ -1,39 +1,27 @@
-# CxbxDebugger
+# Cxbx Reloaded Debugger
 
-CxbxDebugger is an experimental tool to aid debugging Xbox executables from within Cxbx.
+The Cxbx Debugger is a tool to provide debugging capability to Xbox executables emulated by Cxbx Reloaded.
+
+*Note: This repo is a fork of the original project that aims to expand on the original tool as a drop-in replacement*
 
 ![Cxbx-Debugger screenshot at breakpoint](https://i.imgur.com/DaNEbBC.png)
 
 ![Cxbx-Debugger screenshot at memory editor](https://i.imgur.com/zd076l7.png)
 
-The goal is to resolve XBE symbols using the function signatures identified by Cxbx-Reloaded.
 
-This is a workaround for patching or creating PDB files at runtime for Cxbx-Reloaded (where the memory region is pre-allocated - see `virtual_memory_placeholder`). However, in future it may be viable to supporting loading symbols from matching PDB files.
+## How it works
 
-## Methods
+The debugger is a C# application that is launched through Cxbx Reloaded after opening an XBE file. The launch option is `Emulation -> Start Debugger`.
 
-The debugger is a standalone C# application which wraps the child instance of Cxbx-Reloaded used to launch the XBE file.
+Cxbx Reloaded will launch `cxbxr-debugger.exe` and pass on a specific set of arguments.
 
-It uses the debugger API provided by Windows, primarily **WaitForDebugEvent** and **ContinueDebugEvent**. The C# implementation is taken from the VsChromium project.
+Cxbx Debugger will start a new instance of Cxbx Reloaded (passing on the arguments to `cxbx.exe`) with debug privileges
 
-## Roadmap
+The debugger makes use of specific exception messages that the emulator will trigger (such as file events)
 
-### Primary
 
-* ~~Create wrapper for the Cxbx-Reloaded child process~~
-* ~~Support new threads~~
-* ~~Support displaying of interrupts and exceptions~~
-* Support resolving relevant XBE symbols from a callstack
+## Links
 
-### Secondary
-
-* ~~Suspending threads and checking memory~~
-* ~~Breakpoints - inserting and handling interrupts~~
-
-## Thanks
-
-* The Chromium Project for [@VsChromium](https://github.com/chromium/vs-chromium), specifically [these Win32 sources](https://github.com/chromium/vs-chromium/tree/master/src/Core/Win32)
-
+* The C# implementation of the Windows debugger API is taken from [@VsChromium](https://github.com/chromium/vs-chromium)
 * Sebastian Solnica ([@lowleveldesign](https://github.com/lowleveldesign)) for [Process Governor](https://github.com/lowleveldesign/process-governor) and [MinDBG](https://github.com/lowleveldesign/mindbg)
-
 * Alexander Bothe ([@aBothe](https://github.com/aBothe)) for [DDebugger](https://github.com/aBothe/DDebugger)
